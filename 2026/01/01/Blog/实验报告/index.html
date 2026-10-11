@@ -62,9 +62,9 @@
       <div class="qc-article-meta">
         <span><svg class="qc-icon qc-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>2026-01-01</span>
         <i>·</i>
-        <span>3562 字</span>
+        <span>5797 字</span>
         
-        <i>·</i><span>更新 2026-10-09</span>
+        <i>·</i><span>更新 2026-10-12</span>
         
         
         <span class="qc-article-tags">
@@ -76,7 +76,7 @@
       </div>
     </header>
     <div class="qc-prose">
-      <h1 id="1-Wireshark抓包分析"><a href="#1-Wireshark抓包分析" class="headerlink" title="1 Wireshark抓包分析"></a>1 Wireshark抓包分析</h1><p>实验环境介绍：</p>
+      <h1 id="1-Wireshark抓包分析数据流"><a href="#1-Wireshark抓包分析数据流" class="headerlink" title="1 Wireshark抓包分析数据流"></a>1 Wireshark抓包分析数据流</h1><p>实验环境介绍：</p>
 <p>    <strong>192.168.9.209</strong>是kali客户机，<strong>192.168.9.76</strong>是ubuntu服务器，服务端口8081搭载的DVWA靶场。</p>
 <h2 id="1-1-DNS域名解析"><a href="#1-1-DNS域名解析" class="headerlink" title="1.1 DNS域名解析"></a>1.1 DNS域名解析</h2><p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/Wireshark-images/DNS.png" alt="DNS"></p>
 <p>DNS总计查询了三次，也响应了三次：</p>
@@ -114,11 +114,11 @@
 <p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/Wireshark-images/HTTP.png" alt="HTTP"></p>
 <p>在下图中，由于我对8081端口上的网站进行了登录操作，由于网站使用的是http通信，我的用户名，密码，甚至由cookie都暴露了，如果此时有个黑客在网关进行了监听，可以拿着我的cookie冒充身份直接访问目标网站。</p>
 <p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/Wireshark-images/HTTP1.png" alt="HTTP1"></p>
-<h3 id="1-3-1-登录原理解析"><a href="#1-3-1-登录原理解析" class="headerlink" title="1.3.1 登录原理解析"></a>1.3.1 登录原理解析</h3><p>    下图是登录DVWA靶场时抓取到的数据报文，前三次使用了不同的错误密码登录，最后一次是正确的登录（至于我为什么知道，当然是因为密码是我输入的啦，hhh~）</p>
+<h3 id="1-3-1-登录原理解析"><a href="#1-3-1-登录原理解析" class="headerlink" title="1.3.1 登录原理解析"></a>1.3.1 登录原理解析</h3><p>    下图是登录DVWA靶场时抓取到的数据报文，前三次使用了不同的错误密码登录，最后一次是正确的登录。</p>
 <p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/Wireshark-images/HTTP_test1.png" alt="HTTPtest1"></p>
-<p>下面将会仔细的解释数据报文（三次错误密码登录，四个数据报文为一次登录周期，这里只仔细讲解第一次登录周期，为啥不讲完，当然是太麻烦了，哈哈，反正原理都一样的啦，喵~~~）：</p>
-<p>概括：No.6、8、10、11是第一次错误登录周期，No.13、14、16、17是第二次错误登录周期，No.21、22、24、25是第三次错误登录周期。</p>
-<p>No.36、38、40、44、53是成功登录周期，不同的是，No.38数据报文中身份认证通过，302临时重定向到index.php的网页。并向服务端提交GET请求报文，No.44就是服务端的响应报文。</p>
+<p>下面将会仔细的解释数据报文：</p>
+<p>    概括：No.6、8、10、11是第一次错误登录周期，No.13、14、16、17是第二次错误登录周期，No.21、22、24、25是第三次错误登录周期。</p>
+<p>    No.36、38、40、44、53是一次成功登录周期，不同的是，No.38数据报文中身份认证通过，302临时重定向到index.php的网页。并向服务端提交GET请求报文，No.44就是服务端的响应报文。</p>
 <h4 id="（一）客户机发起POST登录请求"><a href="#（一）客户机发起POST登录请求" class="headerlink" title="（一）客户机发起POST登录请求"></a>（一）客户机发起POST登录请求</h4><p>由下图可知，192.168.9.209客户机向192.168.9.76服务器发送POST请求，请求登录:192.168.9.76:8081&#x2F;login.php页面，在这里，我刻意的使用了错误的登录密码向服务器发送了请求登录的<strong>数据报文</strong>。</p>
 <p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/Wireshark-images/HTTP_test2.png" alt="HTTPtest2"></p>
 <h4 id="（二）服务器发送302临时重定向"><a href="#（二）服务器发送302临时重定向" class="headerlink" title="（二）服务器发送302临时重定向"></a>（二）服务器发送302临时重定向</h4><p>    服务端校验了用户名和密码发现对不上后就使用“302临时重定向“指向了\longin.php页面，指示客户端重新登录。</p>
@@ -181,7 +181,7 @@
 <li><strong>如果攻击者只能监听流量，能否复用登录状态：</strong> 直接套用Cookie，冒用身份，甚至还可以数据重发</li>
 <li><strong>服务器应该如何降低风险：</strong> HTTPS 可以保护客户端到服务器之间的传输内容，降低网络监听导致的账号和 Cookie 泄露风险，但不能单独解决身份认证、权限控制和终端被入侵等问题。</li>
 </ul>
-<h1 id="2-Pikachu越权实验报告"><a href="#2-Pikachu越权实验报告" class="headerlink" title="2 Pikachu越权实验报告"></a>2 Pikachu越权实验报告</h1><p><strong>实验环境：</strong></p>
+<h1 id="2-越权实验"><a href="#2-越权实验" class="headerlink" title="2 越权实验"></a>2 越权实验</h1><p><strong>实验环境：</strong></p>
 <ul>
 <li><p>攻击机：Kali Linux，IP：192.168.240.209&#x2F;24</p>
 </li>
@@ -190,7 +190,7 @@
 <li><p>靶场：Pikachu</p>
 </li>
 </ul>
-<h2 id="2-1-HPE（Horizontal-Privilege-Escalation）水平越权"><a href="#2-1-HPE（Horizontal-Privilege-Escalation）水平越权" class="headerlink" title="2.1 HPE（Horizontal Privilege Escalation）水平越权"></a>2.1 HPE（Horizontal Privilege Escalation）水平越权</h2><p>    1、这里首先用正常的账号登录</p>
+<h3 id="2-1-Pikachu靶场"><a href="#2-1-Pikachu靶场" class="headerlink" title="2.1 Pikachu靶场"></a>2.1 Pikachu靶场</h3><h4 id="2-1-1-HPE（Horizontal-Privilege-Escalation）水平越权"><a href="#2-1-1-HPE（Horizontal-Privilege-Escalation）水平越权" class="headerlink" title="2.1.1 HPE（Horizontal Privilege Escalation）水平越权"></a>2.1.1 HPE（Horizontal Privilege Escalation）水平越权</h4><p>    1、这里首先用正常的账号登录</p>
 <p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/Privilege%20Escalation/IODR-1.png" alt="IODR-1"></p>
 <p>    2、登录成功后即可查询本用户的信息，这里通过burpsuite抓包拦截分析查询后的响应包</p>
 <p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/Privilege%20Escalation/IDOR-2.png" alt="IDOR-2"></p>
@@ -209,7 +209,7 @@
 <p>6、这里在删除Cookie的情况下修改username参数仍然可以访问到其他用户的信息，说明服务器没有身份验证也没有权限验证。</p>
 <p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/Privilege%20Escalation/IDOR-6%20%E6%9C%AA%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81%E7%9A%84%E6%B0%B4%E5%B9%B3%E8%B6%8A%E6%9D%83.png" alt="IDOR-6 未身份验证的水平越权"></p>
 <p><strong>实验总结：</strong> 本次实验通过 Burp Suite 抓包和 Repeater 重放，验证了 Pikachu 水平越权模块存在水平越权漏洞。保持 lucy 的会话 Cookie 不变，将 <code>username</code> 参数修改为其他用户后，服务器返回了目标用户信息。进一步删除 Cookie 后仍可访问，说明该接口同时存在未授权访问问题。漏洞成因是服务端未校验登录状态，也未校验当前用户与目标用户的权限关系。修复时应增加登录校验，并从 Session 中获取当前用户，同时增加水平权限校验。</p>
-<h2 id="2-2-VPE-（Vertical-Privilege-Escalation）垂直越权"><a href="#2-2-VPE-（Vertical-Privilege-Escalation）垂直越权" class="headerlink" title="2.2 VPE （Vertical Privilege Escalation）垂直越权"></a>2.2 VPE （Vertical Privilege Escalation）垂直越权</h2><p><strong>Pikachu垂直越权实验报告</strong> </p>
+<h4 id="2-1-2-VPE-（Vertical-Privilege-Escalation）垂直越权"><a href="#2-1-2-VPE-（Vertical-Privilege-Escalation）垂直越权" class="headerlink" title="2.1.2 VPE （Vertical Privilege Escalation）垂直越权"></a>2.1.2 VPE （Vertical Privilege Escalation）垂直越权</h4><p><strong>Pikachu垂直越权实验报告</strong> </p>
 <p><strong>一、实验目的</strong></p>
 <p>理解垂直越权漏洞的成因，掌握通过普通用户会话测试管理员专属功能的方法。</p>
 <p><strong>二、实验环境</strong></p>
@@ -253,6 +253,201 @@
 <li><p>对添加用户、修改权限、删除用户等操作分别验证权限。</p>
 </li>
 </ul>
+<h1 id="3-CSRF实验"><a href="#3-CSRF实验" class="headerlink" title="3 CSRF实验"></a>3 CSRF实验</h1><p>    跨站请求伪造（也称为 CSRF）是一种 Web 安全漏洞，攻击者可以利用它诱使用户执行他们原本无意执行的操作。它允许攻击者部分绕过同源策略，而同源策略旨在防止不同网站相互干扰。</p>
+<p>要使 CSRF 攻击成为可能，必须满足三个关键条件：</p>
+<ul>
+<li><strong>相关操作。</strong> 攻击者有理由诱使应用程序执行某个操作。这可能是特权操作（例如修改其他用户的权限），也可能是对用户特定数据的任何操作（例如更改用户自己的密码）。</li>
+<li><strong>基于 Cookie 的会话处理。</strong> 操作涉及发出一个或多个 HTTP 请求，应用程序仅依赖会话 Cookie 来识别发出请求的用户。没有其他机制来跟踪会话或验证用户请求。</li>
+<li><strong>没有不可预测的请求参数。</strong> 执行操作的请求不包含任何攻击者无法确定或猜测其值的参数。例如，当攻击者需要知道现有密码的值才能使用户更改密码时，该功能不存在安全漏洞。</li>
+</ul>
+<p>例如，假设一个应用程序包含一个允许用户更改其帐户电子邮件地址的功能。当用户执行此操作时，他们会发出如下所示的 HTTP 请求：</p>
+<blockquote>
+<p>POST &#x2F;email&#x2F;change HTTP&#x2F;1.1 </p>
+<p>Host: vulnerable-website.com </p>
+<p>Content-Type: application&#x2F;x-www-form-urlencoded </p>
+<p>Content-Length: 30 </p>
+<p>Cookie: session&#x3D;yvthwsztyeQkAPzeQ5gHgTvlyxHfsAfE </p>
+<p>email&#x3D; <a href="mailto:&#x77;&#x69;&#x65;&#110;&#101;&#x72;&#64;&#110;&#111;&#114;&#109;&#x61;&#108;&#45;&#x75;&#x73;&#101;&#x72;&#x2e;&#99;&#x6f;">wiener@normal-user.co</a> </p>
+</blockquote>
+<p>这符合 CSRF 的必要条件：</p>
+<ul>
+<li>攻击者会关注用户账户电子邮件地址的更改行为。在此操作之后，攻击者通常能够触发密码重置，并完全控制用户的账户。</li>
+<li>该应用程序使用会话 cookie 来识别发出请求的用户。没有其他令牌或机制来跟踪用户会话。</li>
+<li>攻击者可以很容易地确定执行该操作所需的请求参数值。</li>
+</ul>
+<p>在这些条件下，攻击者可以构建一个包含以下 HTML 代码的网页：</p>
+<blockquote>
+<html>
+
+<p>     <body></p>
+<p>         <form action="https://vulnerable-website.com/email/change" method="POST"></p>
+<p>         <input type="hidden" name="email" value="pwned@evil-user.net"/> </p>
+<p>    </form></p>
+<p>            <script> document.forms[0].submit(); </script></p>
+<p>     </body> </p>
+</html></blockquote>
+<p>如果受害用户访问攻击者的网页，将会发生以下情况：</p>
+<ul>
+<li>攻击者的页面将触发向存在漏洞的网站发出 HTTP 请求。</li>
+<li>如果用户已登录到存在漏洞的网站，则其浏览器会自动将会话 cookie 包含在请求中（假设未使用 <a target="_blank" rel="noopener" href="https://portswigger.net/web-security/csrf#common-defences-against-csrf">SameSite cookie ）。</a></li>
+<li>存在漏洞的网站会按正常方式处理请求，将其视为受害用户发出的请求，并更改其电子邮件地址。</li>
+</ul>
+<p><strong>如何构建 CSRF 攻击</strong></p>
+<p>手动创建 CSRF 攻击所需的 HTML 代码可能很繁琐，尤其是在所需请求包含大量参数或请求存在其他特殊情况时。构建 CSRF 攻击的最简单方法是使用Burp Suite Professional 内置的 <a target="_blank" rel="noopener" href="https://portswigger.net/burp/documentation/desktop/tools/engagement-tools/generate-csrf-poc">CSRF PoC 生成器：</a></p>
+<ul>
+<li>在 Burp Suite Professional 中选择要测试或利用的请求。</li>
+<li>从右键菜单中，选择“互动工具”&#x2F;“生成 CSRF PoC”。</li>
+<li>Burp Suite 将生成一些 HTML 代码来触发选定的请求（不包括 cookie，cookie 将由受害者的浏览器自动添加）。</li>
+<li>您可以在 CSRF PoC 生成器中调整各种选项，以微调攻击的各个方面。在某些特殊情况下，您可能需要这样做来处理请求的特殊特性。</li>
+<li>将生成的 HTML 复制到网页中，在已登录到易受攻击网站的浏览器中查看，并测试是否成功发出预期请求并执行所需操作。</li>
+</ul>
+<h2 id="3-1-Pikahcu靶场"><a href="#3-1-Pikahcu靶场" class="headerlink" title="3.1 Pikahcu靶场"></a>3.1 Pikahcu靶场</h2><h3 id="3-1-1-CSRF-GET实验报告"><a href="#3-1-1-CSRF-GET实验报告" class="headerlink" title="3.1.1 CSRF-GET实验报告"></a>3.1.1 CSRF-GET实验报告</h3><p><strong>一、实验信息</strong></p>
+<p>实验日期：2026&#x2F;10&#x2F;11</p>
+<p>实验工具：burpsuite</p>
+<p>实验平台：pikachu</p>
+<p>实验内容：</p>
+<p>实验环境：</p>
+<p>    靶机：192.168.240.76:8081（Arch）</p>
+<p>    实验访问路径：<a target="_blank" rel="noopener" href="http://192.168.240.76:8081/vul/csrf/csrfget/csrf_get_login.php">http://192.168.240.76:8081/vul/csrf/csrfget/csrf_get_login.php</a></p>
+<p>    攻击机：192.168.240.209（Kali）</p>
+<p>    客户机：192.168.240.197（Arch）</p>
+<p>    中间人服务器：192.168.240.210（windows）</p>
+<p><strong>二、实验目的</strong></p>
+<ol>
+<li><p>理解 CSRF 漏洞的基本原理和危害。</p>
+</li>
+<li><p>掌握识别 CSRF 风险请求的方法。</p>
+</li>
+<li><p>了解 GET 型基本表现。</p>
+</li>
+<li><p>分析 CSRF Token、Origin、Referer 和 SameSite 等防护机制。</p>
+</li>
+<li><p>掌握 CSRF 漏洞的修复思路。</p>
+</li>
+</ol>
+<p><strong>三、实验原理</strong></p>
+<p>CSRF-GET 是一种利用受害者当前登录状态，在其不知情的情况下向目标网站发送请求的攻击方式。</p>
+<p>攻击通常需要满足以下条件：</p>
+<ol>
+<li><p>用户已经登录目标网站；</p>
+</li>
+<li><p>浏览器会自动携带身份认证信息，例如 Session Cookie；</p>
+</li>
+<li><p>目标操作会修改服务端状态；</p>
+</li>
+<li><p>服务端缺少有效的请求来源验证或 CSRF Token 校验。</p>
+</li>
+</ol>
+<p>CSRF 与 XSS 的区别是：</p>
+<ul>
+<li><p>CSRF 主要借用用户身份发送请求；</p>
+</li>
+<li><p>XSS 主要是在目标网站上下文中执行恶意脚本盗取客户cookie冒用身份。</p>
+</li>
+</ul>
+<p><strong>四、实验过程</strong></p>
+<p>目标页面地址：<a target="_blank" rel="noopener" href="http://192.168.240.76:8081/vul/csrf/csrfget/csrf_get_login.php">http://192.168.240.76:8081/vul/csrf/csrfget/csrf_get_login.php</a></p>
+<p>测试账户：jack</p>
+<p>    1、 <a target="_blank" rel="noopener" href="http://192.168.240.76:8081/vul/csrf/csrfget/csrf_get.php">http://192.168.240.76:8081/vul/csrf/csrfget/csrf_get.php</a> 是用户登录后的网页地址，实验中先登录jack这个测试账号。</p>
+<p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/CSRF/Pikachu-CSRF-GET-1%20%E7%99%BB%E5%BD%95%E6%AD%A3%E5%B8%B8%E7%94%A8%E6%88%B7.png" alt="Pikachu-CSRF-GET-1 登录正常用户"></p>
+<p>    2、根据业务逻辑，点击“修改个人信息”可以跳转 <a target="_blank" rel="noopener" href="http://192.168.240.76:8081/vul/csrf/csrfget/csrf_get_edit.php">http://192.168.240.76:8081/vul/csrf/csrfget/csrf_get_edit.php</a> 这个页面，经逆向分析可得，该页面存在一个表单，实验中尝试在表单里填入我们想要修改的信息，随后打开burpsuite进行拦截请求报文。</p>
+<p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/CSRF/Pikachu-CSRF-GET-2%20%E4%BF%AE%E6%94%B9%E4%BC%AA%E9%80%A0%E5%90%8E%E7%9A%84%E8%BA%AB%E4%BB%BD%E4%BF%A1%E6%81%AF.png" alt="Pikachu-CSRF-GET-2 修改伪造后的身份信息"></p>
+<p>    3、开启burpsuite拦截后发往Repeter重发器</p>
+<p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/CSRF/Pikachu-CSRF-GET-3%20Burpsuite%E6%8B%A6%E6%88%AA%E8%AF%B7%E6%B1%82%E6%8A%A5%E6%96%87.png" alt="Pikachu-CSRF-GET-3 Burpsuite拦截请求报文"></p>
+<p>    4、在Repeter中使用交互式测试工具生成CSRF-POC伪造的恶意网页</p>
+<p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/CSRF/Pikachu-CSRF-GET-4%20%E7%94%9F%E6%88%90CSRF%E6%B5%8B%E8%AF%95%E7%BD%91%E9%A1%B5.png" alt="Pikachu-CSRF-GET-4 生成CSRF测试网页"></p>
+<p>    5、这里可以清晰的看到整个CSRF恶意网页源码，前面的form标签包含了我们准备修改的参数值，后面的<script>标签包含了提交按钮，点击后自动把第一个表单的值提交给目标网页的后端，所以这里我们先拷贝源码，随后部署到服务器上。</p>
+<p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/CSRF/Pikachu-CSRF-GET-5%20%E6%8B%B7%E8%B4%9DCSRF%E6%B5%8B%E8%AF%95%E7%BD%91%E9%A1%B5.png" alt="Pikachu-CSRF-GET-5 拷贝CSRF测试网页"></p>
+<p>    6、这里我把CSRF恶意网页部署到了192.168.240.210的docker上，通过访问该服务器的<strong>8091</strong>端口即可打开恶意网页。</p>
+<p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/CSRF/Pikachu-CSRF-GET-6%20%E9%83%A8%E7%BD%B2CSRF%E7%9A%84%E4%B8%AD%E9%97%B4%E4%BA%BA%E7%BD%91%E9%A1%B5.png" alt="Pikachu-CSRF-GET-6 部署CSRF的中间人网页"></p>
+<p>    7、把恶意网页部署成功后，打开了192.168.240.187的客户机，接下来就以这台客户机作为被害者先登录jack账号，随后服务器生成SessionID返回给客户机，并被客户机的浏览器保存在Cookie中，保持网页登录状态。</p>
+<p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/CSRF/Pikachu-CSRF-GET-7%20%E5%8F%97%E5%AE%B3%E8%80%85%E7%99%BB%E5%BD%95jack%E8%B4%A6%E5%8F%B7%EF%BC%8C%E5%B9%B6%E6%8C%81%E6%9C%89cookie.png" alt="Pikachu-CSRF-GET-7 受害者登录jack账号，并持有cookie"></p>
+<p>    8、随后经过一系列社会工程学传播，jack打开了 http:192.168.240.210:8091 这个网页来到了这台客户机上，受害人jack好奇的点进了这个网页并试着按下提交按钮。</p>
+<p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/CSRF/Pikachu-CSRF-GET-8%20%E5%8F%97%E5%AE%B3%E8%80%85%E7%82%B9%E8%BF%9B%E4%BA%86CSRF%E7%9A%84%E4%BC%AA%E9%80%A0%E9%A1%B5%E9%9D%A2.png" alt="Pikachu-CSRF-GET-8 受害者点进了CSRF的伪造页面"></p>
+<p>    9、点击提交按钮后，由于网页（192.168.240.210：8081）本身就预设好了目标网址，更改后的信息，以及提交功能，jack的浏览器自动填充了Cookie，随后提交表单，请求包发给了192.168.240.76，服务器校验了身份验证的SessionID直接准予放行，修改了用户的个人信息，这个个人信息中间人是知道的，可以直接冒用。</p>
+<p><img src="https://raw.githubusercontent.com/LiuQinchun/images-Blog/main/CSRF/Pikachu-CSRF-GET-9%20%E5%8F%97%E5%AE%B3%E8%80%85%E7%9A%84%E4%BF%A1%E6%81%AF%E8%A2%ABCSRF%E6%81%B6%E6%84%8F%E7%BD%91%E9%A1%B5%E7%AF%A1%E6%94%B9.png" alt="Pikachu-CSRF-GET-9 受害者的信息被CSRF恶意网页篡改"></p>
+<p>五、实验总结</p>
+<p>    CSRF-GET（跨站请求伪造-GET方法型）：用户已登录目标网站 （192.168.240.76：8081）并持有Cookie，这时访问了恶意网站 （192.168.240.210：8091），恶意网站悄悄让用户的浏览器向目标网站发请求。浏览器会<strong>自动带上 目标网站 的 Cookie</strong>，目标网站的服务器就以为是用户本人的操作，就更改了信息。并且对于<a target="_blank" rel="noopener" href="http://192.168.240.76:8081/vul/csrf/csrfget/csrf_get_login.php">http://192.168.240.76:8081/vul/csrf/csrfget/csrf_get_login.php</a> 这个网站，服务器并没有设置CSRF Token或者Origin/Referer进行拦截，其安全性极低。</p>
+<p>六、实验结果</p>
+<table>
+<thead>
+<tr>
+<th>测试项目</th>
+<th>请求方法</th>
+<th>防护机制</th>
+<th>跨站请求结果</th>
+<th>状态是否改变</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>无防护测试</td>
+<td>[GET/POST]</td>
+<td>无</td>
+<td>[成功/失败]</td>
+<td>[是/否]</td>
+</tr>
+<tr>
+<td>Token 校验测试</td>
+<td>[GET/POST]</td>
+<td>CSRF Token</td>
+<td>[成功/失败]</td>
+<td>[是/否]</td>
+</tr>
+<tr>
+<td>Origin 校验测试</td>
+<td>[GET/POST]</td>
+<td>Origin</td>
+<td>[成功/失败]</td>
+<td>[是/否]</td>
+</tr>
+<tr>
+<td>Referer 校验测试</td>
+<td>[GET/POST]</td>
+<td>Referer</td>
+<td>[成功/失败]</td>
+<td>[是/否]</td>
+</tr>
+<tr>
+<td>SameSite 测试</td>
+<td>[GET/POST]</td>
+<td>SameSite Cookie</td>
+<td>[成功/失败]</td>
+<td>[是/否]</td>
+</tr>
+</tbody></table>
+<p>七、漏洞原因分析</p>
+<p>本实验中，CSRF 风险产生的主要原因是：</p>
+<ol>
+<li><p>目标接口使用 Cookie 进行身份认证；</p>
+</li>
+<li><p>浏览器会自动携带当前会话的身份凭据；</p>
+</li>
+<li><p>服务端未验证请求是否来自用户主动操作；</p>
+</li>
+<li><p>目标接口缺少有效的 CSRF Token 或来源校验；</p>
+</li>
+<li><p>可能存在使用 GET 请求执行状态修改操作的问题。</p>
+</li>
+</ol>
+<p>八、修复建议</p>
+<ol>
+<li><p>为状态修改请求增加不可预测的 CSRF Token。</p>
+</li>
+<li><p>CSRF Token 应与当前用户会话绑定，并在服务端校验。</p>
+</li>
+<li><p>不使用 GET 请求执行密码、权限、配置等状态修改操作。</p>
+</li>
+<li><p>对请求校验 <code>Origin</code>，必要时辅助校验 <code>Referer</code>。</p>
+</li>
+<li><p>为认证 Cookie 设置合适的 <code>SameSite</code> 属性。</p>
+</li>
+<li><p>对高风险操作增加重新认证或二次确认。</p>
+</li>
+<li><p>不能仅依赖前端校验，必须在服务端完成安全验证。</p>
+</li>
+<li><p>对敏感操作增加日志记录和异常行为监控。</p>
+</li>
+</ol>
 
     </div>
     <nav class="qc-post-nav">
@@ -267,7 +462,7 @@
   </div>
 </article>
 
-<aside class="qc-toc"><div class="qc-toc-head"><span>目录 · ON THIS PAGE</span><span class="qc-toc-actions"><button type="button" class="qc-toc-action" data-toc-action="expand" aria-label="展开全部目录" title="展开全部目录"><svg class="qc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M4 7l3-3 3 3M4 17l3 3 3-3"/><path d="M17 4v16M14 7l3-3 3 3M14 17l3 3 3-3"/></svg><span>展开</span></button><button type="button" class="qc-toc-action" data-toc-action="collapse" aria-label="收缩目录层级" title="收缩目录层级"><svg class="qc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>收缩</span></button></span></div><div class="qc-toc-body"><nav class="qc-toc-nav"><div class="qc-toc-node" data-level="1"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv1" data-level="1" href="#1-Wireshark抓包分析">1 Wireshark抓包分析</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="2"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv2" data-level="2" href="#1-1-DNS域名解析">1.1 DNS域名解析</a></div></div><div class="qc-toc-node" data-level="2"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv2" data-level="2" href="#1-2-TCP连接全流程">1.2 TCP连接全流程</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="3"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv3" data-level="3" href="#1-2-1-TCP三次握手">1.2.1 TCP三次握手</a></div></div><div class="qc-toc-node" data-level="3"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv3" data-level="3" href="#1-2-2-TCP四次挥手">1.2.2 TCP四次挥手</a></div></div></div></div><div class="qc-toc-node" data-level="2"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv2" data-level="2" href="#1-3-HTTP">1.3 HTTP</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="3"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv3" data-level="3" href="#1-3-1-登录原理解析">1.3.1 登录原理解析</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="4"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv4" data-level="4" href="#（一）客户机发起POST登录请求">（一）客户机发起POST登录请求</a></div></div><div class="qc-toc-node" data-level="4"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv4" data-level="4" href="#（二）服务器发送302临时重定向">（二）服务器发送302临时重定向</a></div></div><div class="qc-toc-node" data-level="4"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv4" data-level="4" href="#（三）客户机重新发送GET请求">（三）客户机重新发送GET请求</a></div></div><div class="qc-toc-node" data-level="4"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv4" data-level="4" href="#（四）服务器响应客户机GET请求">（四）服务器响应客户机GET请求</a></div></div></div></div><div class="qc-toc-node" data-level="3"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv3" data-level="3" href="#HTTP实验报告">HTTP实验报告</a></div></div></div></div></div></div><div class="qc-toc-node" data-level="1"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv1" data-level="1" href="#2-Pikachu越权实验报告">2 Pikachu越权实验报告</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="2"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv2" data-level="2" href="#2-1-HPE（Horizontal-Privilege-Escalation）水平越权">2.1 HPE（Horizontal Privilege Escalation）水平越权</a></div></div><div class="qc-toc-node" data-level="2"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv2" data-level="2" href="#2-2-VPE-（Vertical-Privilege-Escalation）垂直越权">2.2 VPE （Vertical Privilege Escalation）垂直越权</a></div></div></div></div></nav><div class="qc-toc-track" aria-hidden="true"><div class="qc-toc-thumb"></div></div></div></aside>
+<aside class="qc-toc"><div class="qc-toc-head"><span>目录 · ON THIS PAGE</span><span class="qc-toc-actions"><button type="button" class="qc-toc-action" data-toc-action="expand" aria-label="展开全部目录" title="展开全部目录"><svg class="qc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M4 7l3-3 3 3M4 17l3 3 3-3"/><path d="M17 4v16M14 7l3-3 3 3M14 17l3 3 3-3"/></svg><span>展开</span></button><button type="button" class="qc-toc-action" data-toc-action="collapse" aria-label="收缩目录层级" title="收缩目录层级"><svg class="qc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>收缩</span></button></span></div><div class="qc-toc-body"><nav class="qc-toc-nav"><div class="qc-toc-node" data-level="1"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv1" data-level="1" href="#1-Wireshark抓包分析数据流">1 Wireshark抓包分析数据流</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="2"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv2" data-level="2" href="#1-1-DNS域名解析">1.1 DNS域名解析</a></div></div><div class="qc-toc-node" data-level="2"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv2" data-level="2" href="#1-2-TCP连接全流程">1.2 TCP连接全流程</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="3"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv3" data-level="3" href="#1-2-1-TCP三次握手">1.2.1 TCP三次握手</a></div></div><div class="qc-toc-node" data-level="3"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv3" data-level="3" href="#1-2-2-TCP四次挥手">1.2.2 TCP四次挥手</a></div></div></div></div><div class="qc-toc-node" data-level="2"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv2" data-level="2" href="#1-3-HTTP">1.3 HTTP</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="3"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv3" data-level="3" href="#1-3-1-登录原理解析">1.3.1 登录原理解析</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="4"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv4" data-level="4" href="#（一）客户机发起POST登录请求">（一）客户机发起POST登录请求</a></div></div><div class="qc-toc-node" data-level="4"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv4" data-level="4" href="#（二）服务器发送302临时重定向">（二）服务器发送302临时重定向</a></div></div><div class="qc-toc-node" data-level="4"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv4" data-level="4" href="#（三）客户机重新发送GET请求">（三）客户机重新发送GET请求</a></div></div><div class="qc-toc-node" data-level="4"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv4" data-level="4" href="#（四）服务器响应客户机GET请求">（四）服务器响应客户机GET请求</a></div></div></div></div><div class="qc-toc-node" data-level="3"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv3" data-level="3" href="#HTTP实验报告">HTTP实验报告</a></div></div></div></div></div></div><div class="qc-toc-node" data-level="1"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv1" data-level="1" href="#2-越权实验">2 越权实验</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="3"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv3" data-level="3" href="#2-1-Pikachu靶场">2.1 Pikachu靶场</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="4"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv4" data-level="4" href="#2-1-1-HPE（Horizontal-Privilege-Escalation）水平越权">2.1.1 HPE（Horizontal Privilege Escalation）水平越权</a></div></div><div class="qc-toc-node" data-level="4"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv4" data-level="4" href="#2-1-2-VPE-（Vertical-Privilege-Escalation）垂直越权">2.1.2 VPE （Vertical Privilege Escalation）垂直越权</a></div></div></div></div></div></div><div class="qc-toc-node" data-level="1"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv1" data-level="1" href="#3-CSRF实验">3 CSRF实验</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="2"><div class="qc-toc-row"><button type="button" class="qc-toc-toggle" aria-expanded="true" aria-label="切换子标题"><span aria-hidden="true">›</span></button><a class="qc-toc-link lv2" data-level="2" href="#3-1-Pikahcu靶场">3.1 Pikahcu靶场</a></div><div class="qc-toc-children"><div class="qc-toc-node" data-level="3"><div class="qc-toc-row"><span class="qc-toc-toggle-placeholder" aria-hidden="true"></span><a class="qc-toc-link lv3" data-level="3" href="#3-1-1-CSRF-GET实验报告">3.1.1 CSRF-GET实验报告</a></div></div></div></div></div></div></nav><div class="qc-toc-track" aria-hidden="true"><div class="qc-toc-thumb"></div></div></div></aside>
 
 
   <footer class="qc-footer">
